@@ -231,6 +231,10 @@ export class Task {
 			updateTaskHistory: this.updateTaskHistory,
 		})
 
+		// Initialize file context tracker
+		this.fileContextTracker = new FileContextTracker(context, this.taskId)
+		this.modelContextTracker = new ModelContextTracker(context, this.taskId)
+
 		// Initialize checkpoint manager
 		this.checkpointManager = createTaskCheckpointManager(
 			{
@@ -242,6 +246,7 @@ export class Task {
 				say: this.say.bind(this),
 				messageStateHandler: this.messageStateHandler,
 				cancelTask: this.cancelTask,
+				fileContextTracker: this.fileContextTracker,
 			},
 			{
 				conversationHistoryDeletedRange: this.taskState.conversationHistoryDeletedRange,
@@ -249,10 +254,6 @@ export class Task {
 				checkpointTrackerErrorMessage: this.taskState.checkpointTrackerErrorMessage,
 			},
 		)
-
-		// Initialize file context tracker
-		this.fileContextTracker = new FileContextTracker(controller, this.taskId)
-		this.modelContextTracker = new ModelContextTracker(controller.context, this.taskId)
 
 		// Prepare effective API configuration
 		const effectiveApiConfiguration: ApiConfiguration = {
@@ -393,21 +394,6 @@ export class Task {
 	async restoreCheckpoint(messageTs: number, restoreType: ClineCheckpointRestore, offset?: number) {
 		// Delegate to the checkpoint manager
 		await this.checkpointManager.restoreCheckpoint(messageTs, restoreType, offset)
-
-		// Handle file context warnings for task-only restores
-		if (restoreType === "task") {
-			const clineMessages = this.messageStateHandler.getClineMessages()
-			const messageIndex = clineMessages.findIndex((m) => m.ts === messageTs) - (offset || 0)
-			const deletedMessages = clineMessages.slice(messageIndex + 1)
-
-			const filesEditedAfterMessage = await this.fileContextTracker.detectFilesEditedAfterMessage(
-				messageTs,
-				deletedMessages,
-			)
-			if (filesEditedAfterMessage.length > 0) {
-				await this.fileContextTracker.storePendingFileContextWarning(filesEditedAfterMessage)
-			}
-		}
 
 		// Update task state conversation history deleted range from checkpoint manager
 		this.taskState.conversationHistoryDeletedRange = this.checkpointManager.getCurrentState().conversationHistoryDeletedRange
