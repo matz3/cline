@@ -694,13 +694,16 @@ export class Controller {
 		return {
 			version,
 			apiConfiguration,
-			uriScheme,
-			currentTaskItem,
-			checkpointTrackerErrorMessage,
-			clineMessages,
-			taskHistory: processedTaskHistory,
+			uriScheme: vscode.env.uriScheme,
+			currentTaskItem: this.task?.taskId ? (taskHistory || []).find((item) => item.id === this.task?.taskId) : undefined,
+			checkpointManagerErrorMessage: this.task?.taskState.checkpointManagerErrorMessage,
+			clineMessages: this.task?.messageStateHandler.getClineMessages() || [],
+			taskHistory: (taskHistory || [])
+				.filter((item) => item.ts && item.task)
+				.sort((a, b) => b.ts - a.ts)
+				.slice(0, 100), // for now we're only getting the latest 100 tasks, but a better solution here is to only pass in 3 for recent task history, and then get the full task history on demand when going to the task history view (maybe with pagination?)
 			shouldShowAnnouncement,
-			platform,
+			platform: process.platform as Platform,
 			autoApprovalSettings,
 			browserSettings,
 			preferredLanguage,
