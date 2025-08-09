@@ -134,7 +134,7 @@ export class Task {
 	// User chat state
 	autoApprovalSettings: AutoApprovalSettings
 	browserSettings: BrowserSettings
-	FocusChainSettings: FocusChainSettings
+	focusChainSettings: FocusChainSettings
 	preferredLanguage: string
 	openaiReasoningEffort: OpenaiReasoningEffort
 	mode: Mode
@@ -200,7 +200,7 @@ export class Task {
 		this.diffViewProvider = HostProvider.get().createDiffViewProvider()
 		this.autoApprovalSettings = autoApprovalSettings
 		this.browserSettings = browserSettings
-		this.FocusChainSettings = FocusChainSettings
+		this.focusChainSettings = FocusChainSettings
 		this.preferredLanguage = preferredLanguage
 		this.openaiReasoningEffort = openaiReasoningEffort
 		this.mode = mode
@@ -244,7 +244,7 @@ export class Task {
 		this.modelContextTracker = new ModelContextTracker(controller.context, this.taskId)
 
 		// Initialize focus chain manager only if enabled
-		if (this.FocusChainSettings.enabled) {
+		if (this.focusChainSettings.enabled) {
 			this.FocusChainManager = new FocusChainManager({
 				taskId: this.taskId,
 				taskState: this.taskState,
@@ -252,7 +252,7 @@ export class Task {
 				context: this.getContext(),
 				postStateToWebview: this.postStateToWebview,
 				say: this.say.bind(this),
-				focusChainSettings: this.FocusChainSettings,
+				focusChainSettings: this.focusChainSettings,
 			})
 		}
 
@@ -317,7 +317,7 @@ export class Task {
 			this.startTask(task, images, files)
 		}
 
-		// Set up todo file watcher (async, runs in background) only if focus chain is enabled
+		// Set up focus chain file watcher (async, runs in background) only if focus chain is enabled
 		if (this.FocusChainManager) {
 			this.FocusChainManager.setupFocusChainFileWatcher().catch((error) => {
 				console.error(`[Task ${this.taskId}] Failed to setup focus chain file watcher:`, error)
@@ -348,7 +348,7 @@ export class Task {
 			this.cacheService,
 			this.autoApprovalSettings,
 			this.browserSettings,
-			this.FocusChainSettings,
+			this.focusChainSettings,
 			cwd,
 			this.taskId,
 			this.ulid,
@@ -1656,7 +1656,7 @@ export class Task {
 			supportsBrowserUse,
 			this.mcpHub,
 			this.browserSettings,
-			this.FocusChainSettings,
+			this.focusChainSettings,
 			isNextGenModel,
 		)
 
@@ -2530,10 +2530,10 @@ export class Task {
 
 		// Add focu chain list instructions if needed
 		if (this.FocusChainManager?.shouldIncludeFocusChainInstructions()) {
-			const todoInstructions = this.FocusChainManager.generateFocusChainInstructions()
+			const focusChainInstructions = this.FocusChainManager.generateFocusChainInstructions()
 			processedUserContent.push({
 				type: "text",
-				text: todoInstructions,
+				text: focusChainInstructions,
 			})
 
 			this.taskState.apiRequestsSinceLastTodoUpdate = 0
