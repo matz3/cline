@@ -78,6 +78,7 @@ import { MessageStateHandler } from "./message-state"
 import { TaskState } from "./TaskState"
 import { ToolExecutor } from "./ToolExecutor"
 import { updateApiReqMsg } from "./utils"
+import { TaskCheckpointManager, createTaskCheckpointManager } from "@integrations/checkpoints"
 
 export const USE_EXPERIMENTAL_CLAUDE4_FEATURES = false
 
@@ -230,8 +231,8 @@ export class Task {
 		})
 
 		// Initialize file context tracker
-		this.fileContextTracker = new FileContextTracker(context, this.taskId)
-		this.modelContextTracker = new ModelContextTracker(context, this.taskId)
+		this.fileContextTracker = new FileContextTracker(this.controller, this.taskId)
+		this.modelContextTracker = new ModelContextTracker(this.controller.context, this.taskId)
 
 		// Initialize checkpoint manager
 		try {
@@ -243,7 +244,7 @@ export class Task {
 					enableCheckpoints: enableCheckpointsSetting,
 				},
 				{
-					context,
+					context: this.controller.context,
 					diffViewProvider: this.diffViewProvider,
 					messageStateHandler: this.messageStateHandler,
 					fileContextTracker: this.fileContextTracker,
