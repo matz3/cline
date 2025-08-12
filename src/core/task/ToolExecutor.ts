@@ -126,7 +126,7 @@ export class ToolExecutor {
 		private removeLastPartialMessageIfExistsWithType: (type: "ask" | "say", askOrSay: ClineAsk | ClineSay) => Promise<void>,
 		private executeCommandTool: (command: string) => Promise<[boolean, any]>,
 		private doesLatestTaskCompletionHaveNewChanges: () => Promise<boolean>,
-		private updateTodoListFromToolResponse: (taskProgress: string | undefined) => Promise<void>,
+		private updateFCListFromToolResponse: (taskProgress: string | undefined) => Promise<void>,
 	) {
 		this.autoApprover = new AutoApprove(autoApprovalSettings)
 	}
@@ -800,7 +800,7 @@ export class ToolExecutor {
 						await this.diffViewProvider.reset()
 
 						if (!block.partial && this.focusChainSettings.enabled) {
-							await this.updateTodoListFromToolResponse(block.params.task_progress)
+							await this.updateFCListFromToolResponse(block.params.task_progress)
 						}
 
 						await this.saveCheckpoint()
@@ -893,7 +893,7 @@ export class ToolExecutor {
 						}
 
 						if (!block.partial && this.focusChainSettings.enabled) {
-							await this.updateTodoListFromToolResponse(block.params.task_progress)
+							await this.updateFCListFromToolResponse(block.params.task_progress)
 						}
 
 						await this.saveCheckpoint()
@@ -975,7 +975,7 @@ export class ToolExecutor {
 						this.pushToolResult(result, block)
 
 						if (!block.partial && this.focusChainSettings.enabled) {
-							await this.updateTodoListFromToolResponse(block.params.task_progress)
+							await this.updateFCListFromToolResponse(block.params.task_progress)
 						}
 
 						await this.saveCheckpoint()
@@ -1052,7 +1052,7 @@ export class ToolExecutor {
 						this.pushToolResult(result, block)
 
 						if (!block.partial) {
-							await this.updateTodoListFromToolResponse(block.params.task_progress)
+							await this.updateFCListFromToolResponse(block.params.task_progress)
 						}
 
 						await this.saveCheckpoint()
@@ -1141,7 +1141,7 @@ export class ToolExecutor {
 						this.pushToolResult(results, block)
 
 						if (!block.partial) {
-							await this.updateTodoListFromToolResponse(block.params.task_progress)
+							await this.updateFCListFromToolResponse(block.params.task_progress)
 						}
 
 						await this.saveCheckpoint()
@@ -1320,7 +1320,7 @@ export class ToolExecutor {
 								)
 
 								if (!block.partial) {
-									await this.updateTodoListFromToolResponse(block.params.task_progress)
+									await this.updateFCListFromToolResponse(block.params.task_progress)
 								}
 
 								await this.saveCheckpoint()
@@ -2207,7 +2207,7 @@ export class ToolExecutor {
 						const options = parsePartialArrayString(optionsRaw || "[]")
 
 						if (!block.partial && this.focusChainSettings.enabled) {
-							await this.updateTodoListFromToolResponse(block.params.task_progress)
+							await this.updateFCListFromToolResponse(block.params.task_progress)
 						}
 
 						this.taskState.isAwaitingPlanResponse = true
@@ -2390,14 +2390,14 @@ export class ToolExecutor {
 								telemetryService.captureTaskCompleted(this.taskId, this.ulid)
 
 								if (this.focusChainSettings.enabled) {
-									await this.updateTodoListFromToolResponse(block.params.task_progress)
+									await this.updateFCListFromToolResponse(block.params.task_progress)
 								}
 							} else {
 								// we already sent a command message, meaning the complete completion message has also been sent
 								await this.saveCheckpoint(true)
 
 								if (this.focusChainSettings.enabled) {
-									await this.updateTodoListFromToolResponse(block.params.task_progress)
+									await this.updateFCListFromToolResponse(block.params.task_progress)
 								}
 							}
 
@@ -2423,7 +2423,7 @@ export class ToolExecutor {
 							telemetryService.captureTaskCompleted(this.taskId, this.ulid)
 
 							if (this.focusChainSettings.enabled) {
-								await this.updateTodoListFromToolResponse(block.params.task_progress)
+								await this.updateFCListFromToolResponse(block.params.task_progress)
 							}
 						}
 
