@@ -2,13 +2,8 @@
 
 ## 3.24.0
 
-### Minor Changes
-
 - 9dc021a: Remove deprecated GPT-4.5 Preview
 - 3e2bdf8: Add CLINE_ACTIVE environment variable to Cline-managed terminals
-
-### Patch Changes
-
 - 2081bb8: Fixes the API Keys URL for Requesty
 - 2cf1d86: Set gpt5 max tokens to 8_192 to fix 'context window exceeded' error
 - 45767b8: Fix issue where fallback request to retrieve cost was not using correct auth token
